@@ -4,7 +4,7 @@ const storage={get(k,fallback){try{return JSON.parse(localStorage.getItem(STORAG
 let mcqAnswers=storage.get('mcq',{}),essaysText=storage.get('essays',{}),reviewed=storage.get('reviewed',{}),flashStatus=storage.get('flash',{});
 function tab(go){document.querySelectorAll('[data-go]').forEach(b=>b.classList.toggle('active',b.dataset.go===go));document.querySelectorAll('.main-section').forEach(s=>s.classList.toggle('active',s.id===go+'-section'));window.scrollTo({top:0,behavior:'instant'})}
 document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>tab(b.dataset.go)));
-$('topicCount').textContent=DATA.summary.length;$('essayCount').textContent=DATA.essays.length;$('mcqCount').textContent=DATA.mcq.length;$('flashCount').textContent=DATA.flashcards.length;
+$('topicCount').textContent=DATA.summary.length;$('essayCount').textContent=STRUCTURED.length;$('mcqCount').textContent=DATA.mcq.length;$('flashCount').textContent=DATA.flashcards.length;
 // Detailed notes. All topic details start expanded for reading.
 $('summary-list').innerHTML=DATA.summary.map((t,i)=>`<details class="summary-card" open><summary><span class="number">${String(i+1).padStart(2,'0')}</span><span><h3>${esc(t.title)}</h3><span class="source">Source slides ${esc(t.slides)}</span></span><span class="down">⌄</span></summary><div class="inner"><p class="lead">${esc(t.lead)}</p>${t.blocks.map(([h,b])=>`<div class="subtopic"><h4>${esc(h)}</h4><p>${b}</p></div>`).join('')}</div></details>`).join('');
 $('expand-all').onclick=()=>document.querySelectorAll('.summary-card').forEach(e=>e.open=true);
@@ -12,20 +12,69 @@ $('collapse-all').onclick=()=>document.querySelectorAll('.summary-card').forEach
 function doPrint(mode){document.body.classList.remove('print-summary','print-questions','print-answers');document.body.classList.add('print-'+mode);document.querySelectorAll('.summary-card').forEach(e=>e.open=true);if(mode==='answers')document.querySelectorAll('.answer-box').forEach(e=>e.classList.remove('hidden'));window.print();}
 window.addEventListener('afterprint',()=>document.body.classList.remove('print-summary','print-questions','print-answers'));
 $('print-summary').onclick=()=>doPrint('summary');$('print-questions').onclick=()=>doPrint('questions');$('print-answers').onclick=()=>doPrint('answers');
-// Essays and self-assessment. Stored drafts are not submitted anywhere.
-const kinds=[...new Set(DATA.essays.map(x=>x.kind))],topics=[...new Set(DATA.essays.map(x=>x.topic))];
-$('essay-kind').innerHTML+=[...kinds].map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');
-$('essay-topic').innerHTML+=[...topics].map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');
-function textToParas(s){return s.split(/\n\n+/).map(p=>`<p>${esc(p).replace(/\n/g,' ')}</p>`).join('')}
-function renderEssays(){const term=$('essay-search').value.toLowerCase().trim(),topic=$('essay-topic').value,kind=$('essay-kind').value;const filtered=DATA.essays.map((v,i)=>({...v,original:i})).filter(e=>(topic==='all'||e.topic===topic)&&(kind==='all'||e.kind===kind)&&(!term||[e.question,e.topic,e.answer].join(' ').toLowerCase().includes(term)));
-$('essay-filter-count').textContent=`${filtered.length} of ${DATA.essays.length} questions`;
-$('essay-list').innerHTML=filtered.map(e=>`<article class="essay-card" data-essay="${e.original}"><div class="qhead"><span class="qnum">Q${e.original+1}</span><div class="pills"><span class="pill">${esc(e.topic)}</span><span class="pill">${esc(e.kind)}</span><span class="pill pmarks">${e.marks} suggested marks</span><span class="pill">Slides ${esc(e.slides)}</span></div></div><div class="qtitle">${esc(e.question)}</div><label for="essay-${e.original}">Your written answer · save automatically</label><textarea class="essay-input" id="essay-${e.original}" data-input="${e.original}" rows="4" placeholder="Write complete sentences here, e.g. identify the issue, explain why it matters, link it to the case, propose an action..."></textarea><div class="essay-toolbar"><span id="status-${e.original}" class="${reviewed[e.original]?'reviewed':'model-note'}">${reviewed[e.original]?'✓ Marked reviewed':'Try it before revealing the guide'}</span><div class="right"><button class="btn" data-show="points" data-index="${e.original}">Show marking points</button><button class="btn primary" data-show="answer" data-index="${e.original}">Show model answer</button><button class="btn" data-reviewed="${e.original}">Mark reviewed</button></div></div><div class="answer-box hidden" id="points-${e.original}"><h4>Suggested marking points</h4><ul class="marking">${e.points.map(p=>`<li>${esc(p)}</li>`).join('')}</ul><p class="model-note">Suggested checklist, not an official allocation of marks.</p></div><div class="answer-box hidden" id="answer-${e.original}"><h4>Model answer · full-sentence format</h4>${textToParas(e.answer)}</div></article>`).join('')||'<div class="empty">No questions match your filters.</div>';
-filtered.forEach(e=>{$('essay-'+e.original).value=essaysText[e.original]||'';});
+// Exam-style structured questions, patterned on the two uploaded BITP 3423 past papers.
+// The past papers contain Part A (five structured questions, 50 marks) and Part B (two case studies, 50 marks).
+// Our original scenarios and marking suggestions are revision examples, NOT copied examination questions or official keys.
+const examKinds=[...new Set(STRUCTURED.map(x=>x.section))];
+const examTopics=[...new Set(STRUCTURED.map(x=>x.topic))];
+$('essay-kind').innerHTML+=examKinds.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');
+$('essay-topic').innerHTML+=examTopics.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');
+let structAnswers=storage.get('structured_answers_v2',{});
+let structReviewed=storage.get('structured_reviewed_v2',{});
+function renderStructured(){
+ const term=$('essay-search').value.toLowerCase().trim(),topic=$('essay-topic').value,kind=$('essay-kind').value,sel=$('exam-set').value;
+ const filtered=STRUCTURED.map((e,i)=>({...e,original:i})).filter(e=>
+  (topic==='all'||e.topic===topic) && (kind==='all'||e.section===kind) && (sel==='all'||e.practiceSet===sel) &&
+  (!term||[e.scenario,e.topic,e.section,...e.parts.flatMap(p=>[p.question,...p.items,p.model])].join(' ').toLowerCase().includes(term))
+ );
+ $('essay-filter-count').textContent=`${filtered.length} of ${STRUCTURED.length} practice questions`;
+ $('essay-list').innerHTML=filtered.map(e=>{
+  const total=e.parts.reduce((s,p)=>s+p.marks,0);
+  return `<article class="essay-card st-card" data-structured="${e.original}">
+    <div class="qhead"><span class="qnum">${esc(e.display)}</span><div class="pills"><span class="pill">${esc(e.topic)}</span><span class="pill">${esc(e.section)}</span><span class="pill pmarks">${total} marks</span><span class="pill">Lecture slides ${esc(e.slides)}</span></div></div>
+    <p class="st-scenario">${esc(e.scenario)}</p>
+    ${e.parts.map((p,j)=>{
+      const key=e.original+':'+j;
+      return `<div class="st-part">
+       <div class="st-prompt"><span class="st-letter">(${esc(p.letter)})</span><div class="st-ask">${esc(p.question)}</div><span class="st-mark">(${p.marks} marks)</span></div>
+       <label for="struct-${e.original}-${j}">Your answer to (${esc(p.letter)}) · autosaved</label>
+       <textarea class="essay-input st-answer-input" id="struct-${e.original}-${j}" data-structured-input="${key}" rows="2" placeholder="Write distinct numbered points. Add a short explanation or case example for each."></textarea>
+       <div class="st-guide-actions"><button class="btn" data-guide="${e.original}-${j}" aria-expanded="false">Reveal full suggested answer + marking points</button><span class="model-note">${p.items.length} expected points · indicative allocation only</span></div>
+       <div class="answer-box hidden" id="st-guide-${e.original}-${j}">
+         <h4>Suggested full answer for (${esc(p.letter)})</h4>
+         <div class="st-full-model"><p>${esc(p.model)}</p></div>
+         <h4 class="st-points-title">Key marking points</h4>
+         <ol class="marking st-marking">${p.items.map(item=>`<li>${esc(item)}</li>`).join('')}</ol>
+         <p class="model-note">The model response is an example, not an official answer scheme. Approximately ${p.marks/p.items.length} mark(s) per relevant point for this practice question. Other valid and well-explained answers may earn credit.</p>
+       </div>
+      </div>`;
+    }).join('')}
+    <div class="essay-toolbar"><span id="st-review-${e.original}" class="${structReviewed[e.original]?'reviewed':'model-note'}">${structReviewed[e.original]?'✓ Marked reviewed':'Answer all subparts, then reveal the guides'}</span><div class="right"><button class="btn" data-struct-review="${e.original}">${structReviewed[e.original]?'Unmark reviewed':'Mark reviewed'}</button></div></div>
+   </article>`;
+ }).join('')||'<div class="empty">No structured questions match the selected filters.</div>';
+ filtered.forEach(e=>e.parts.forEach((p,j)=>{const el=$('struct-'+e.original+'-'+j);if(el)el.value=structAnswers[e.original+':'+j]||'';}));
 }
-renderEssays();
-$('essay-topic').onchange=renderEssays;$('essay-kind').onchange=renderEssays;$('essay-search').oninput=renderEssays;
-$('essay-list').addEventListener('input',ev=>{if(ev.target.dataset.input!==undefined){essaysText[ev.target.dataset.input]=ev.target.value;storage.set('essays',essaysText)}});
-$('essay-list').addEventListener('click',ev=>{let b=ev.target.closest('button');if(!b)return;if(b.dataset.show){const el=$(b.dataset.show+'-'+b.dataset.index);let hiding=!el.classList.toggle('hidden');b.textContent=(hiding?'Hide ':'Show ')+(b.dataset.show==='points'?'marking points':'model answer');}else if(b.dataset.reviewed!==undefined){const i=b.dataset.reviewed;reviewed[i]=!reviewed[i];storage.set('reviewed',reviewed);$('status-'+i).textContent=reviewed[i]?'✓ Marked reviewed':'Try it before revealing the guide';$('status-'+i).className=reviewed[i]?'reviewed':'model-note';b.textContent=reviewed[i]?'Unmark reviewed':'Mark reviewed';}});
+renderStructured();
+$('essay-topic').onchange=renderStructured;
+$('essay-kind').onchange=renderStructured;
+$('exam-set').onchange=renderStructured;
+$('essay-search').oninput=renderStructured;
+$('essay-list').addEventListener('input',ev=>{
+ if(ev.target.dataset.structuredInput!==undefined){structAnswers[ev.target.dataset.structuredInput]=ev.target.value;storage.set('structured_answers_v2',structAnswers)}
+});
+$('essay-list').addEventListener('click',ev=>{
+ const b=ev.target.closest('button');if(!b)return;
+ if(b.dataset.guide!==undefined){
+  const el=$('st-guide-'+b.dataset.guide),shown=el.classList.toggle('hidden')===false;
+  b.textContent=shown?'Hide suggested answer + marking points':'Reveal full suggested answer + marking points';
+  b.setAttribute('aria-expanded',String(shown));
+ } else if(b.dataset.structReview!==undefined){
+  const i=b.dataset.structReview;structReviewed[i]=!structReviewed[i];storage.set('structured_reviewed_v2',structReviewed);
+  $('st-review-'+i).textContent=structReviewed[i]?'✓ Marked reviewed':'Answer all subparts, then reveal the guides';
+  $('st-review-'+i).className=structReviewed[i]?'reviewed':'model-note';
+  b.textContent=structReviewed[i]?'Unmark reviewed':'Mark reviewed';
+ }
+});
 // MCQ with immediate feedback and reason.
 function renderMCQ(){let correct=0,completed=0;let out='';DATA.mcq.forEach((q,i)=>{const selected=mcqAnswers[i],answered=Number.isInteger(selected);if(answered){completed++;if(selected===q.correct)correct++;}out+=`<article class="question-card"><div class="qhead"><span class="qnum">${i+1}</span><div class="qtitle">${esc(q.question)}</div><div class="pills"><span class="pill">Slides ${esc(q.slides)}</span></div></div><div class="choices">${q.choices.map((opt,j)=>`<button class="choice ${answered&&j===q.correct?'right':''} ${answered&&j===selected&&j!==q.correct?'wrong':''}" ${answered?'disabled':''} data-q="${i}" data-choice="${j}"><span class="letter">${'ABCD'[j]}</span>${esc(opt)}</button>`).join('')}</div>${answered?`<div class="explain"><b>${selected===q.correct?'Correct!':'Not quite.'} Answer: ${'ABCD'[q.correct]}.</b> ${esc(q.explanation)}</div>`:''}</article>`});
 $('mcq-list').innerHTML=out;$('quiz-summary').innerHTML=`<strong>${completed} / ${DATA.mcq.length}</strong> answered · <strong>${correct}</strong> correct${completed===DATA.mcq.length?' · Quiz complete — revisit any incorrect answers after reset.':''}`;

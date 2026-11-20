@@ -15,7 +15,7 @@
 <div><div class="big"><b id="oPct">0%</b><span id="oLvl">Not started</span></div></div>
 <span class="bar" role="img" id="oBarLabel" aria-label="Overall understanding"><i id="oBar"></i></span>
 <dl class="stats" id="oStats"></dl>
-<p class="note">Understanding = 50% MCQ marks + 30% flashcards marked “known” + 20% essays marked reviewed, each out of the lecture’s full total. Unattempted items count as zero.</p>
+<p class="note">Understanding = 50% MCQ marks + 30% flashcards marked “known” + 20% structured questions marked reviewed, each out of the lecture’s full total. Unattempted items count as zero.</p>
 <p class="note" id="storeWarn" hidden>This browser view blocks local storage, so progress can’t be saved here. Open the file directly in your browser to keep your marks.</p>
 <div>
 <div class="progress-tools" aria-label="Progress backup">
@@ -25,7 +25,7 @@
 <button class="btn" id="importBtn" type="button">Import progress</button>
 </div>
 <input id="importFile" type="file" accept="application/json,.json" hidden>
-<p class="note">Backup files include saved essay drafts. Store them somewhere private.</p>
+<p class="note">Backup files include saved structured-answer drafts. Store them somewhere private.</p>
 </div>
 <button class="btn danger reset" id="resetBtn" type="button">Reset All Progress</button>
 <p class="note" id="status" role="status" style="margin-top:8px"></p>
@@ -56,7 +56,7 @@
 
 <dialog id="dlg" aria-labelledby="dt">
 <h2 id="dt">Erase all progress?</h2>
-<p>This permanently deletes your MCQ marks, flashcard ratings, reviewed essays and any essay answers you typed for Lectures 1–6.</p>
+<p>This permanently deletes your MCQ marks, flashcard ratings, reviewed structured questions and any structured answers you typed for Lectures 1–6.</p>
 <p><b>This cannot be undone.</b></p>
 <div class="dlg-acts"><button class="btn" id="cancelBtn" type="button" autofocus>Cancel</button><button class="btn danger" id="confirmBtn" type="button">Yes, erase progress</button></div>
 </dialog>

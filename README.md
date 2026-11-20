@@ -1,6 +1,6 @@
 # Study4BITP3423
 
-A browser-based study hub helping UTeM students prepare for Special Topic in Software Engineering tests and exams. Features include lecture summaries, mind maps, essay practice, multiple-choice questions, flashcards, and progress tracking.
+A browser-based study hub helping UTeM students prepare for Special Topic in Software Engineering tests and exams. Features include lecture summaries, mind maps, structured-question practice, multiple-choice questions, flashcards, and progress tracking.
 
 ## Contents
 
@@ -20,21 +20,23 @@ A browser-based study hub helping UTeM students prepare for Special Topic in Sof
 
 ## Study content
 
-| # | Lecture | Topics | MCQs | Flashcards | Essays |
+| # | Lecture | Topics | MCQs | Flashcards | Structured questions |
 |---:|---|---:|---:|---:|---:|
-| 1 | Current Trends & Emerging Technologies | 12 | 15 | 43 | 36 |
-| 2 | Ethics & Social Responsibility | 8 | 15 | 35 | 29 |
-| 3 | Foundation of Enterprise Architecture | 10 | 15 | 36 | 33 |
-| 4 | Advanced Topics in Enterprise Architecture | 10 | 15 | 39 | 34 |
-| 5 | Advanced Technologies, Part 1 | 10 | 15 | 40 | 36 |
-| 6 | Advanced Technologies, Part 2 | 12 | 15 | 43 | 46 |
-| | **Total** | **62** | **90** | **236** | **214** |
+| 1 | Current Trends & Emerging Technologies | 12 | 15 | 43 | 17 |
+| 2 | Ethics & Social Responsibility | 8 | 15 | 35 | 17 |
+| 3 | Foundation of Enterprise Architecture | 10 | 15 | 36 | 17 |
+| 4 | Advanced Topics in Enterprise Architecture | 10 | 15 | 39 | 17 |
+| 5 | Advanced Technologies, Part 1 | 10 | 15 | 40 | 17 |
+| 6 | Advanced Technologies, Part 2 | 12 | 15 | 43 | 17 |
+| | **Total** | **62** | **90** | **236** | **102** |
+
+Each lecture provides 15 Part A structured questions across three practice sets and two extended Part B case studies. Every subquestion includes an indicative mark allocation, key marking points, and a full suggested answer.
 
 Each lecture contains five sections:
 
 1. **Summary** — notes organised by topic, with slide references.
 2. **Mind Map** — quick-recall groups and a memory-testing mode.
-3. **Essay Practice** — questions, marking guidance, model answers, and space for a draft response.
+3. **Structured Practice** — Part A questions and Part B case studies with mark allocations, marking points, full suggested answers, and autosaved response fields.
 4. **MCQ Practice** — immediate feedback and an explanation for each answer.
 5. **Flashcards** — cards that can be marked as known or needing more practice.
 
@@ -46,7 +48,7 @@ Each lecture contains five sections:
 - Overall and per-lecture understanding scores
 - Lecture switcher and dashboard return button
 - Lecture summaries and quick-recall mind maps
-- Essay questions with marking guidance and model answers
+- Structured questions and case studies with full suggested answers and marking points
 - Multiple-choice practice with immediate feedback
 - Flashcards with known and needs-practice states
 - Local progress tracking
@@ -73,7 +75,7 @@ Each lecture's understanding percentage is calculated from its complete set of a
 ```text
 Understanding % = 50 × (correct MCQs ÷ total MCQs)
                 + 30 × (known flashcards ÷ total flashcards)
-                + 20 × (reviewed essays ÷ total essays)
+                + 20 × (reviewed structured questions ÷ total structured questions)
 ```
 
 Unattempted activities contribute zero. The overall percentage is the average of all six lecture scores.
@@ -89,7 +91,7 @@ Unattempted activities contribute zero. The overall percentage is the average of
 
 ## Resetting progress
 
-Select **Reset All Progress** on the dashboard to open a confirmation dialog. Confirming the reset removes the study hub's saved MCQ answers, essay drafts, essay review states, and flashcard ratings for all six lectures.
+Select **Reset All Progress** on the dashboard to open a confirmation dialog. Confirming the reset removes the study hub's saved MCQ answers, structured-answer drafts, structured-question review states, and flashcard ratings for all six lectures.
 
 This action cannot be undone. It does not clear unrelated browser data.
 
@@ -118,13 +120,13 @@ The dashboard loads each lecture page in an iframe. Shared styling and behavior 
 
 ## Local data and privacy
 
-Study progress and essay drafts are stored in the browser using `localStorage`. They are not submitted to a server by the application.
+Study progress and structured-answer drafts are stored in the browser using `localStorage`. They are not submitted to a server by the application.
 
 Each lecture stores four categories of data:
 
 - `mcq` — selected MCQ answers
-- `essays` — typed essay drafts
-- `reviewed` — essay review states
+- `structured_answers_v2` — typed answers to structured subquestions
+- `structured_reviewed_v2` — structured-question review states
 - `flash` — flashcards marked known or needing practice
 
 Clearing browser storage or using the dashboard's reset option removes saved progress. Progress may also be stored separately when the project is opened from different locations or browsers.
@@ -133,11 +135,11 @@ The study hub does not require an internet connection for its learning features 
 
 ### Exporting and importing progress
 
-Use **Export progress** on the dashboard to download a versioned JSON backup. The file contains progress for all six lectures, including saved essay drafts, and is created entirely in the browser without uploading data anywhere.
+Use **Export progress** on the dashboard to download a versioned JSON backup. The file contains progress for all six lectures, including saved structured-answer drafts, and is created entirely in the browser without uploading data anywhere.
 
 Use **Import progress** to select a backup created by this study hub. The application validates its format and values before showing a confirmation. Confirming the import replaces the study hub progress currently stored in that browser. If browser storage fails during the import, the previous progress is restored.
 
-Backup files are not encrypted. Store them somewhere private if essay drafts contain personal information.
+Backup files are not encrypted. Store them somewhere private if structured-answer drafts contain personal information.
 
 ## Troubleshooting
 
@@ -152,7 +154,7 @@ Backup files are not encrypted. Store them somewhere private if essay drafts con
 ## Known limitations
 
 - Progress is local to one browser and page location; there is no account or cloud sync.
-- Clearing browser storage removes saved progress and essay drafts.
+- Clearing browser storage removes saved progress and structured-answer drafts.
 - Preview environments that block scripts, iframes, or local storage may not run the project correctly.
 - The optional feedback form requires an internet connection when opened.
 
