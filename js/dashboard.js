@@ -3,8 +3,57 @@ const SRC=["lectures/lecture-1.html","lectures/lecture-2.html","lectures/lecture
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const GO=[['summary','Summary'],['mind','Mind Map'],['essay','Essays'],['mcq','MCQ'],['flash','Flashcards']];
+const BACKUP_APP='study4bitp3423-progress',BACKUP_VERSION=1,PROGRESS_KEYS=['mcq','flash','reviewed','essays'],MAX_BACKUP_BYTES=2*1024*1024;
 let storeOK=true;try{localStorage.setItem('__t','1');localStorage.removeItem('__t')}catch(e){storeOK=false}
 const read=(L,k)=>{try{return JSON.parse(localStorage.getItem(L.prefix+k))||{}}catch(e){return{}}};
+const isRecord=value=>value!==null&&typeof value==='object'&&!Array.isArray(value);
+function cleanIndexed(source,max,valid,label,strict=true){
+if(!isRecord(source)){if(strict)throw new Error(label+' must be an object.');source={}}
+const output={};
+for(const [key,value] of Object.entries(source)){
+const index=Number(key),validKey=/^(0|[1-9]\d*)$/.test(key)&&Number.isInteger(index)&&index>=0&&index<max;
+if(!validKey||!valid(value)){if(strict)throw new Error('Invalid '+label+' entry.');continue}
+output[key]=value;
+}
+return output;
+}
+function cleanLecture(source,L,strict=true){
+if(!isRecord(source)){if(strict)throw new Error('Invalid lecture progress.');source={}}
+if(strict&&Object.keys(source).some(key=>!PROGRESS_KEYS.includes(key)))throw new Error('Unexpected lecture progress field.');
+return{
+mcq:cleanIndexed(source.mcq,L.correct.length,value=>Number.isInteger(value)&&value>=0&&value<=3,'MCQ',strict),
+flash:cleanIndexed(source.flash,L.flash,value=>value==='known'||value==='missed','flashcard',strict),
+reviewed:cleanIndexed(source.reviewed,L.essays,value=>typeof value==='boolean','reviewed essay',strict),
+essays:cleanIndexed(source.essays,L.essays,value=>typeof value==='string'&&value.length<=50000,'essay draft',strict)
+};
+}
+function makeBackup(){
+return{app:BACKUP_APP,version:BACKUP_VERSION,exportedAt:new Date().toISOString(),lectures:META.map((L,index)=>({id:index+1,...cleanLecture(Object.fromEntries(PROGRESS_KEYS.map(key=>[key,read(L,key)])),L,false)}))};
+}
+function validateBackup(value){
+if(!isRecord(value)||value.app!==BACKUP_APP||value.version!==BACKUP_VERSION)throw new Error('This is not a compatible Study Hub backup.');
+if(typeof value.exportedAt!=='string'||!Number.isFinite(Date.parse(value.exportedAt)))throw new Error('The backup date is invalid.');
+if(!Array.isArray(value.lectures)||value.lectures.length!==META.length)throw new Error('The backup must contain all six lectures.');
+const seen=new Set(),lectures=[];
+for(const entry of value.lectures){
+if(!isRecord(entry)||!Number.isInteger(entry.id)||entry.id<1||entry.id>META.length||seen.has(entry.id))throw new Error('The backup contains an invalid lecture id.');
+if(Object.keys(entry).some(key=>key!=='id'&&!PROGRESS_KEYS.includes(key)))throw new Error('The backup contains an unexpected field.');
+seen.add(entry.id);lectures[entry.id-1]=cleanLecture(Object.fromEntries(PROGRESS_KEYS.map(key=>[key,entry[key]])),META[entry.id-1],true);
+}
+return{app:BACKUP_APP,version:BACKUP_VERSION,exportedAt:value.exportedAt,lectures};
+}
+function progressStorageKeys(){return META.flatMap(L=>PROGRESS_KEYS.map(key=>L.prefix+key))}
+function replaceProgress(lectures){
+const keys=progressStorageKeys(),previous=new Map(keys.map(key=>[key,localStorage.getItem(key)]));
+try{
+keys.forEach(key=>localStorage.removeItem(key));
+lectures.forEach((lecture,index)=>PROGRESS_KEYS.forEach(key=>localStorage.setItem(META[index].prefix+key,JSON.stringify(lecture[key]))));
+}catch(error){
+keys.forEach(key=>{try{localStorage.removeItem(key)}catch(e){}});
+previous.forEach((value,key)=>{if(value!==null)try{localStorage.setItem(key,value)}catch(e){}});
+throw error;
+}
+}
 function stats(L){
 const m=read(L,'mcq'),f=read(L,'flash'),e=read(L,'reviewed');
 let answered=0,correct=0;L.correct.forEach((c,i)=>{if(Number.isInteger(m[i])){answered++;if(m[i]===c)correct++}});
@@ -52,6 +101,23 @@ $('switch').onchange=e=>go(+e.target.value);
 window.addEventListener('hashchange',route);
 window.addEventListener('storage',()=>{if(!$('dash').hidden)render()});
 window.addEventListener('focus',()=>{if(!$('dash').hidden)render()});
+/* local JSON progress backup */
+$('exportBtn').onclick=()=>{try{
+const backup=makeBackup(),blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),link=document.createElement('a');
+link.href=url;link.download='study4bitp3423-progress-'+new Date().toISOString().slice(0,10)+'.json';document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+$('status').textContent='Progress exported. The file includes your saved essay drafts.';
+}catch(error){$('status').textContent='Progress could not be exported in this browser.'}};
+let pendingImport=null;
+$('importBtn').onclick=()=>{$('importFile').click()};
+$('importFile').onchange=async event=>{const file=event.target.files[0];event.target.value='';if(!file)return;
+try{
+if(file.size>MAX_BACKUP_BYTES)throw new Error('The selected file is larger than 2 MB.');
+const parsed=JSON.parse(await file.text());pendingImport=validateBackup(parsed);
+const when=new Date(pendingImport.exportedAt).toLocaleString('en-GB',{timeZone:'Asia/Kuala_Lumpur',dateStyle:'long',timeStyle:'short'});
+$('importSummary').textContent='Backup created '+when+' (GMT+8). Importing it will replace progress currently saved in this browser.';$('importDlg').showModal();
+}catch(error){pendingImport=null;$('status').textContent='Import rejected: '+(error instanceof SyntaxError?'the file is not valid JSON.':error.message)}};
+$('importCancelBtn').onclick=()=>{pendingImport=null;$('importDlg').close()};
+$('importConfirmBtn').onclick=()=>{if(!pendingImport)return;try{replaceProgress(pendingImport.lectures);pendingImport=null;$('importDlg').close();render();$('status').textContent='Progress imported successfully.'}catch(error){$('importDlg').close();pendingImport=null;$('status').textContent='Import failed. Your previous progress was restored.'}};
 /* reset with confirmation */
 $('resetBtn').onclick=()=>$('dlg').showModal();
 $('cancelBtn').onclick=()=>$('dlg').close();

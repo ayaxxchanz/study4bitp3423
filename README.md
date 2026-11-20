@@ -50,9 +50,10 @@ Each lecture contains five sections:
 - Multiple-choice practice with immediate feedback
 - Flashcards with known and needs-practice states
 - Local progress tracking
+- Versioned JSON export and import for transferring or backing up progress
 - Confirmation dialog before all progress is reset
 - Printable study materials
-- Live Malaysia-time clock
+- Fixed last-updated timestamp in Malaysia time
 - Responsive layout for desktop and mobile screens
 
 ## Running the project
@@ -130,6 +131,14 @@ Clearing browser storage or using the dashboard's reset option removes saved pro
 
 The study hub does not require an internet connection for its learning features or visual assets. The feedback link in the footer is an optional external link and requires internet access when opened.
 
+### Exporting and importing progress
+
+Use **Export progress** on the dashboard to download a versioned JSON backup. The file contains progress for all six lectures, including saved essay drafts, and is created entirely in the browser without uploading data anywhere.
+
+Use **Import progress** to select a backup created by this study hub. The application validates its format and values before showing a confirmation. Confirming the import replaces the study hub progress currently stored in that browser. If browser storage fails during the import, the previous progress is restored.
+
+Backup files are not encrypted. Store them somewhere private if essay drafts contain personal information.
+
 ## Troubleshooting
 
 | Problem | What to try |
@@ -153,7 +162,7 @@ Use a current version of Chrome, Edge, Firefox, or Safari. Browser settings that
 
 ## Content notice
 
-The materials are study aids. Model answers, marking points, worked examples, and explanations should not be treated as an official lecturer answer key.
+These materials are study aids. Model answers, marking points, worked examples, and explanations should not be treated as an official lecturer answer key. The MCQs are intended only to help users quickly recall key points; they do not represent the actual exam format.
 
 ## Feedback
 

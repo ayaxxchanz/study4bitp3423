@@ -8,7 +8,8 @@
 <link rel="stylesheet" href="css/dashboard.css">
 </head>
 <body>
-<div id="dash" class="shell">
+<div id="dash">
+<div class="shell">
 <aside class="panel" aria-label="Overall progress">
 <div><p class="eyebrow">Special Topic in Software Engineering</p><h1>Exam Study Hub</h1></div>
 <div><div class="big"><b id="oPct">0%</b><span id="oLvl">Not started</span></div></div>
@@ -17,20 +18,34 @@
 <p class="note">Understanding = 50% MCQ marks + 30% flashcards marked “known” + 20% essays marked reviewed, each out of the lecture’s full total. Unattempted items count as zero.</p>
 <p class="note" id="storeWarn" hidden>This browser view blocks local storage, so progress can’t be saved here. Open the file directly in your browser to keep your marks.</p>
 <div>
+<div class="progress-tools" aria-label="Progress backup">
+<p class="eyebrow">Progress backup</p>
+<div class="progress-actions">
+<button class="btn" id="exportBtn" type="button">Export progress</button>
+<button class="btn" id="importBtn" type="button">Import progress</button>
+</div>
+<input id="importFile" type="file" accept="application/json,.json" hidden>
+<p class="note">Backup files include saved essay drafts. Store them somewhere private.</p>
+</div>
 <button class="btn danger reset" id="resetBtn" type="button">Reset All Progress</button>
 <p class="note" id="status" role="status" style="margin-top:8px"></p>
 </div>
 </aside>
 <main>
+<aside class="study-notice" role="note" aria-labelledby="study-notice-title">
+<strong id="study-notice-title">Study-material notice</strong>
+<p>These materials are study aids. Model answers, marking points, worked examples, and explanations should not be treated as an official lecturer answer key. The MCQs are intended only to help you quickly recall key points; they do not represent the actual exam format.</p>
+</aside>
 <label class="eyebrow" for="q" style="display:block;margin-bottom:6px">Jump to a topic across all six lectures</label>
 <input id="q" class="search" type="search" placeholder="e.g. TOGAF, blockchain, ROI, SDGs" autocomplete="off">
 <ul class="hits" id="hits" aria-live="polite"></ul>
 <div class="list" id="list"></div>
 </main>
+</div>
 <footer class="foot">
 <p>Made by Aliya H.</p>
 <p>Feedback and suggestions are welcome. Please share them through <a href="https://forms.gle/fW17FkKTP6RkafSC7" target="_blank" rel="noopener noreferrer">this feedback form</a>.</p>
-<p>Last updated: <time datetime="2026-11-20T21:59:53+08:00">Friday, 20 November 2026, 21:59</time> (GMT+8)</p>
+<p>Last updated: <time datetime="2026-11-20T22:24:35+08:00">Friday, 20 November 2026, 22:24</time> (GMT+8)</p>
 </footer>
 </div>
 
@@ -44,6 +59,13 @@
 <p>This permanently deletes your MCQ marks, flashcard ratings, reviewed essays and any essay answers you typed for Lectures 1–6.</p>
 <p><b>This cannot be undone.</b></p>
 <div class="dlg-acts"><button class="btn" id="cancelBtn" type="button" autofocus>Cancel</button><button class="btn danger" id="confirmBtn" type="button">Yes, erase progress</button></div>
+</dialog>
+
+<dialog id="importDlg" aria-labelledby="importTitle">
+<h2 id="importTitle">Import saved progress?</h2>
+<p id="importSummary">This replaces the progress currently saved in this browser.</p>
+<p><b>Your current progress will be replaced.</b></p>
+<div class="dlg-acts"><button class="btn" id="importCancelBtn" type="button" autofocus>Cancel</button><button class="btn primary" id="importConfirmBtn" type="button">Import and replace</button></div>
 </dialog>
 
 <script src="js/dashboard.js"></script>
