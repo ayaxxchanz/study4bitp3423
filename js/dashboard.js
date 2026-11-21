@@ -4,6 +4,14 @@ META.forEach(lecture=>lecture.structured=17);
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const GO=[['summary','Summary'],['mind','Mind Map'],['essay','Structured Questions'],['mcq','MCQ'],['flash','Flashcards']];
+const GO_ICONS={
+summary:'<path d="M8 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-3"/><path d="M8 2h8v4H8zM7 11h10M7 15h10"/>',
+mind:'<rect x="8" y="2" width="8" height="6" rx="1"/><rect x="2" y="16" width="8" height="6" rx="1"/><rect x="14" y="16" width="8" height="6" rx="1"/><path d="M12 8v4M6 16v-4h12v4"/>',
+essay:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h6"/>',
+mcq:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="m7 9 2 2 4-4M7 16h10"/>',
+flash:'<rect x="7" y="3" width="14" height="16" rx="2"/><path d="M17 21H5a2 2 0 0 1-2-2V7m11 0-3 5h5l-3 5"/>'
+};
+const jumpIcon=key=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${GO_ICONS[key]}</svg>`;
 const BACKUP_APP='study4bitp3423-progress',BACKUP_VERSION=1,PROGRESS_KEYS=['mcq','flash','reviewed','essays'],MAX_BACKUP_BYTES=2*1024*1024;
 const STORAGE_SUFFIX={reviewed:'structured_reviewed_v2',essays:'structured_answers_v2'};
 let storeOK=true;try{localStorage.setItem('__t','1');localStorage.removeItem('__t')}catch(e){storeOK=false}
@@ -80,7 +88,7 @@ function render(){
 const S=META.map(stats);
 $('list').innerHTML=META.map((L,i)=>{const s=S[i];return`<article class="lec" id="row-${i+1}"><header><span class="no">${String(i+1).padStart(2,'0')}</span><h2>${esc(L.title)}</h2><div class="score"><b>${s.u}%</b><span>${level(s.u,s.active)}</span></div></header>
 <div class="meters">${meter('MCQ mark',s.correct,L.correct.length)}${meter('Flashcards known',s.known,L.flash)}${meter('Structured questions reviewed',s.reviewed,L.structured)}</div>
-<div class="acts"><button class="btn primary" data-open="${i+1}" type="button">Open lecture</button><span class="sep">Jump to</span>${GO.map(g=>`<button class="btn" data-open="${i+1}" data-go="${g[0]}" type="button">${g[1]}</button>`).join('')}</div>
+<div class="acts"><button class="btn primary" data-open="${i+1}" type="button">Open lecture</button><span class="sep">Jump to</span>${GO.map(g=>`<a class="jump-link" href="#lecture-${i+1}" data-open="${i+1}" data-go="${g[0]}">${jumpIcon(g[0])}<span>${g[1]}</span></a>`).join('')}</div>
 <details><summary>${L.topics.length} topics</summary><ol class="topics">${L.topics.map((t,j)=>`<li><button data-open="${i+1}" data-topic="${j}" type="button">${esc(t)}</button></li>`).join('')}</ol></details></article>`}).join('');
 const sum=k=>S.reduce((a,s)=>a+s[k],0),tot=k=>META.reduce((a,L)=>a+(k==='c'?L.correct.length:k==='f'?L.flash:L.structured),0);
 const any=S.some(s=>s.active),o=Math.round(S.reduce((a,s)=>a+s.u,0)/S.length);
@@ -106,6 +114,7 @@ function route(){const m=/^#lecture-(\d)$/.exec(location.hash);
 if(m&&META[m[1]-1])openViewer(+m[1]);else{closeFrame();$('viewer').hidden=true;$('dash').hidden=false;render()}}
 function go(n,o){pend=o||null;const h='#lecture-'+n;if(location.hash!==h)location.hash=h;else route()}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-open]');if(!b)return;
+if(b.tagName==='A'){if(e.button!==0||e.ctrlKey||e.metaKey||e.shiftKey||e.altKey)return;e.preventDefault()}
 go(+b.dataset.open,{go:b.dataset.go,topic:b.dataset.topic!==undefined?+b.dataset.topic:null})});
 $('back').onclick=()=>{history.pushState('',document.title,location.pathname+location.search);route()};
 $('switch').innerHTML=META.map((L,i)=>`<option value="${i+1}">Lecture ${i+1} · ${esc(L.title)}</option>`).join('');
