@@ -1295,8 +1295,9 @@ button[data-guide]:hover {
   );
   background-position: 0 14px;
   border: 2px solid #18181B;
-  border-radius: 14px;
-  box-shadow: 4px 4px 0px #18181B;
+  border-radius: 0;
+  box-shadow: none;
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
   padding: 1.25rem 1.375rem 1.375rem 1.75rem;
   line-height: 28px;
   margin-bottom: 18px;
@@ -1311,6 +1312,18 @@ button[data-guide]:hover {
   left: 16px;
   width: 2px;
   background-color: rgba(34, 197, 94, 0.4);
+}
+
+.st-full-model::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 10px;
+  height: 10px;
+  background-color: #18181B;
+  clip-path: polygon(0 0, 100% 100%, calc(100% - 2.83px) 100%, 0 2.83px);
+  pointer-events: none;
 }
 
 .st-full-model p {
