@@ -2,11 +2,43 @@ const $=(x)=>document.getElementById(x);
 const esc=(s)=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const storage={get(k,fallback){try{return JSON.parse(localStorage.getItem(STORAGE_PREFIX+k))??fallback}catch(e){return fallback}},set(k,v){try{localStorage.setItem(STORAGE_PREFIX+k,JSON.stringify(v))}catch(e){}}};
 let mcqAnswers=storage.get('mcq',{}),essaysText=storage.get('essays',{}),reviewed=storage.get('reviewed',{}),flashStatus=storage.get('flash',{});
-function tab(go){document.querySelectorAll('[data-go]').forEach(b=>b.classList.toggle('active',b.dataset.go===go));document.querySelectorAll('.main-section').forEach(s=>s.classList.toggle('active',s.id===go+'-section'));window.scrollTo({top:0,behavior:'instant'})}
+const tabNames=['summary','mind','essay','mcq','flash'];
+function tab(go){
+ if(!tabNames.includes(go))return;
+ document.querySelectorAll('[data-go]').forEach(b=>b.classList.toggle('active',b.dataset.go===go));
+ document.querySelectorAll('.main-section').forEach(s=>s.classList.toggle('active',s.id===go+'-section'));
+ storage.set('activeTab',go);
+ storage.set('activeTopic',null);
+ if(location.hash!=='#'+go+'-section')history.replaceState(null,'','#'+go+'-section');
+ window.scrollTo({top:0,behavior:'instant'});
+}
+function restoreTab(){
+ const topicHash=/^#topic-(\d+)(?:-(?:header|content))?$/.exec(location.hash);
+ if(topicHash&&openTopic(Number(topicHash[1])-1))return;
+ const hashTab=location.hash.slice(1).replace(/-section$/,'');
+ const savedTab=storage.get('activeTab','summary');
+ const savedTopic=storage.get('activeTopic',null);
+ if(!tabNames.includes(hashTab)&&savedTab==='summary'&&Number.isInteger(savedTopic)&&openTopic(savedTopic))return;
+ tab(tabNames.includes(hashTab)?hashTab:tabNames.includes(savedTab)?savedTab:'summary');
+}
+function openTopic(index){
+ if(!Number.isInteger(index)||index<0||index>=DATA.summary.length)return false;
+ const card=$('topic-'+(index+1));
+ if(!card)return false;
+ tab('summary');
+ card.open=true;
+ storage.set('activeTopic',index);
+ history.replaceState(null,'','#topic-'+(index+1)+'-header');
+ const scroll=()=>card.scrollIntoView({block:'start',behavior:'instant'});
+ scroll();
+ requestAnimationFrame(scroll);
+ return true;
+}
 document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>tab(b.dataset.go)));
+window.addEventListener('hashchange',restoreTab);
 $('topicCount').textContent=DATA.summary.length;$('essayCount').textContent=STRUCTURED.length;$('mcqCount').textContent=DATA.mcq.length;$('flashCount').textContent=DATA.flashcards.length;
 // Detailed notes. All topic details start expanded for reading.
-$('summary-list').innerHTML=DATA.summary.map((t,i)=>`<details class="summary-card" open><summary><span class="number">${String(i+1).padStart(2,'0')}</span><span><h3>${esc(t.title)}</h3><span class="source">Source slides ${esc(t.slides)}</span></span><span class="down" aria-hidden="true"><svg class="lucide" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></summary><div class="inner"><p class="lead">${esc(t.lead)}</p>${t.blocks.map(([h,b])=>`<div class="subtopic"><h4>${esc(h)}</h4><p>${b}</p></div>`).join('')}</div></details>`).join('');
+$('summary-list').innerHTML=DATA.summary.map((t,i)=>`<details class="summary-card" id="topic-${i+1}" open><summary id="topic-${i+1}-header" aria-controls="topic-${i+1}-content"><span class="number">${String(i+1).padStart(2,'0')}</span><span><h3>${esc(t.title)}</h3><span class="source">Source slides ${esc(t.slides)}</span></span><span class="down" aria-hidden="true"><svg class="lucide" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></summary><div class="inner" id="topic-${i+1}-content" aria-labelledby="topic-${i+1}-header"><p class="lead">${esc(t.lead)}</p>${t.blocks.map(([h,b])=>`<div class="subtopic"><h4>${esc(h)}</h4><p>${b}</p></div>`).join('')}</div></details>`).join('');
 $('expand-all').onclick=()=>document.querySelectorAll('.summary-card').forEach(e=>e.open=true);
 $('collapse-all').onclick=()=>document.querySelectorAll('.summary-card').forEach(e=>e.open=false);
 function doPrint(mode){document.body.classList.remove('print-summary','print-questions','print-answers');document.body.classList.add('print-'+mode);document.querySelectorAll('.summary-card').forEach(e=>e.open=true);if(mode==='answers')document.querySelectorAll('.answer-box').forEach(e=>e.classList.remove('hidden'));window.print();}
@@ -119,8 +151,10 @@ window.addEventListener('message',event=>{
  const route=event.data;
  if(!route||route.type!=='study-route')return;
  if(route.topic!=null){
-  tab('summary');
-  const card=document.querySelectorAll('.summary-card')[route.topic];
-  if(card){card.open=true;card.scrollIntoView({block:'start'})}
+  openTopic(Number(route.topic));
  }else if(route.go)tab(route.go);
 });
+
+// Restore after the topic cards and the rest of the lecture have rendered.
+restoreTab();
+window.addEventListener('load',restoreTab);

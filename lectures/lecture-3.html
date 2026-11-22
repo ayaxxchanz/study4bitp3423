@@ -9,31 +9,31 @@
 </head>
 <body>
 <div class="mobile-tabs" aria-label="Study pack sections">
-  <button class="tab active" data-go="summary"><span class="ico">▤</span>Summary</button>
-<button class="tab" data-go="mind"><span class="ico">✦</span>Mind Map</button>
-  <button class="tab" data-go="essay"><span class="ico">✎</span>Structured Practice</button>
-  <button class="tab" data-go="mcq"><span class="ico">◉</span>MCQ Practice</button>
-  <button class="tab" data-go="flash"><span class="ico">▣</span>Flashcards</button>
+  <button class="tab active" data-go="summary" id="mobile-summary-tab" aria-controls="summary-section"><span class="ico">▤</span>Summary</button>
+<button class="tab" data-go="mind" id="mobile-mind-tab" aria-controls="mind-section"><span class="ico">✦</span>Mind Map</button>
+  <button class="tab" data-go="essay" id="mobile-essay-tab" aria-controls="essay-section"><span class="ico">✎</span>Structured Practice</button>
+  <button class="tab" data-go="mcq" id="mobile-mcq-tab" aria-controls="mcq-section"><span class="ico">◉</span>MCQ Practice</button>
+  <button class="tab" data-go="flash" id="mobile-flash-tab" aria-controls="flash-section"><span class="ico">▣</span>Flashcards</button>
 </div>
 <div class="app">
 <aside class="sidebar">
  <div class="brand"><div class="mark">SE</div><div><b>Exam Study Pack</b><small>Lecture 03 · Full revision</small></div></div>
  <div class="nav-label">Revise & practise</div>
- <button class="tab active" data-go="summary"><span class="ico">▤</span>Detailed Summary</button>
-<button class="tab" data-go="mind"><span class="ico">✦</span>Mind Map</button>
- <button class="tab" data-go="essay"><span class="ico">✎</span>Structured Questions</button>
- <button class="tab" data-go="mcq"><span class="ico">◉</span>MCQ Practice</button>
- <button class="tab" data-go="flash"><span class="ico">▣</span>Flashcards</button>
+ <button class="tab active" data-go="summary" id="sidebar-summary-tab" aria-controls="summary-section"><span class="ico">▤</span>Detailed Summary</button>
+<button class="tab" data-go="mind" id="sidebar-mind-tab" aria-controls="mind-section"><span class="ico">✦</span>Mind Map</button>
+ <button class="tab" data-go="essay" id="sidebar-essay-tab" aria-controls="essay-section"><span class="ico">✎</span>Structured Questions</button>
+ <button class="tab" data-go="mcq" id="sidebar-mcq-tab" aria-controls="mcq-section"><span class="ico">◉</span>MCQ Practice</button>
+ <button class="tab" data-go="flash" id="sidebar-flash-tab" aria-controls="flash-section"><span class="ico">▣</span>Flashcards</button>
  <div class="side-foot">Based on the uploaded <em>Lecture 3: Foundation of Enterprise Architecture</em> slides. Slide references are shown throughout. Model answers and worked cases are original practice material based on the lecture.</div>
 </aside>
 <main>
+<section class="main-section active" id="summary-section">
 <header class="hero"><div class="eyebrow">Special Topic in Software Engineering · Lecture 3</div><h1>Foundation of Enterprise Architecture</h1><p>Understand EA concepts, the four architecture layers, frameworks and business–IT alignment. Full-sentence notes, essay model answers, MCQ explanations and flashcards, with <strong>extra emphasis on structured questions</strong>.</p></header>
 <aside class="study-notice" role="note" aria-labelledby="study-notice-title">
 <strong id="study-notice-title">Notice</strong>
 <p>These materials are study aids. Model answers, marking points, worked examples, and explanations should not be treated as an official lecturer answer key. The MCQs are intended only to help you quickly recall key points; they do not represent the actual exam format.</p>
 </aside>
 <div class="metric-row"><div class="metric"><strong id="topicCount">8</strong><span>Detailed study topics</span></div><div class="metric"><strong id="essayCount">29</strong><span>Structured exam questions</span></div><div class="metric"><strong id="mcqCount">15</strong><span>MCQs with explanations</span></div><div class="metric"><strong id="flashCount">35</strong><span>Recall flashcards</span></div></div>
-<section class="main-section active" id="summary-section">
  <div class="section-head"><div><h2>Detailed Summary</h2><p>Organised around the lecture, with the explanation behind every key point.</p></div><div class="tool-row"><button class="btn" id="expand-all"><svg class="lucide" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg><span>Expand all</span></button><button class="btn" id="collapse-all"><svg class="lucide" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m7 20 5-5 5 5"/><path d="m7 4 5 5 5-5"/></svg><span>Collapse all</span></button><button class="btn" id="print-summary"><svg class="lucide" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6"/><rect x="6" y="14" width="12" height="8" rx="1"/></svg><span>Print notes</span></button></div></div>
  <div class="callout"><b>The central exam argument</b><p>Enterprise Architecture (EA) is a <strong>whole-organisation view</strong> connecting business goals, processes, information, applications and technology. It helps decisions work together rather than allowing each department to optimise its own system in isolation.</p></div>
  <div class="steps"><div class="step"><b>1 · See the whole</b><p>Connect business, data, applications and technology.</p></div><div class="step"><b>2 · Explain dependencies</b><p>Show how a change in one layer affects the others.</p></div><div class="step"><b>3 · Prove alignment</b><p>Trace IT decisions to business outcomes and feedback.</p></div></div>
