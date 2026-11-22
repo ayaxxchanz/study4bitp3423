@@ -115,7 +115,7 @@ if(m&&META[m[1]-1])openViewer(+m[1]);else{closeFrame();$('viewer').hidden=true;$
 function go(n,o){pend=o||null;const h='#lecture-'+n;if(location.hash!==h)location.hash=h;else route()}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-open]');if(!b)return;
 if(b.tagName==='A'){if(e.button!==0||e.ctrlKey||e.metaKey||e.shiftKey||e.altKey)return;e.preventDefault()}
-go(+b.dataset.open,{go:b.dataset.go,topic:b.dataset.topic!==undefined?+b.dataset.topic:null})});
+go(+b.dataset.open,{go:b.dataset.go||'summary',topic:b.dataset.topic!==undefined?+b.dataset.topic:null})});
 $('back').onclick=()=>{history.pushState('',document.title,location.pathname+location.search);route()};
 $('switch').innerHTML=META.map((L,i)=>`<option value="${i+1}">Lecture ${i+1} · ${esc(L.title)}</option>`).join('');
 $('switch').onchange=e=>go(+e.target.value);
