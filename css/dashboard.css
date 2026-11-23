@@ -1,4 +1,4 @@
-/* Claymorphic Comic Ledger · Exam Study Hub Dashboard */
+/* Dashboard and not-found page styles. */
 @font-face {
   font-family: 'Rubik';
   src: url('../fonts/Rubik-Variable.ttf') format('truetype');
@@ -57,7 +57,9 @@ html {
   background: var(--color-page);
 }
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: inherit;
 }
 
@@ -69,7 +71,10 @@ body {
   font: 400 15px/1.6 var(--font-body);
 }
 
-button, input, select, textarea {
+button,
+input,
+select,
+textarea {
   font-family: inherit;
   font-size: inherit;
   color: inherit;
@@ -85,7 +90,6 @@ button, input, select, textarea {
   color: var(--color-ink);
 }
 
-/* Layout Shell */
 .shell {
   max-width: 1280px;
   margin: 0 auto;
@@ -96,7 +100,6 @@ button, input, select, textarea {
   align-items: start;
 }
 
-/* Left Sidebar Panel (Near-Black Developer Surface) */
 .panel {
   position: sticky;
   top: 24px;
@@ -221,7 +224,6 @@ dl.stats dd {
   color: var(--color-inverse-muted);
 }
 
-/* Progress tools */
 .progress-tools {
   display: grid;
   gap: 10px;
@@ -237,7 +239,6 @@ dl.stats dd {
   gap: 10px;
 }
 
-/* Claymorphic / Neobrutalist Buttons */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -341,7 +342,6 @@ dl.stats dd {
   width: 100%;
 }
 
-/* Option 1: Comic Sticker Panel (Sunburst) — Study Notice */
 .study-notice {
   position: relative;
   background-color: #FEFCE8;
@@ -380,7 +380,6 @@ dl.stats dd {
   line-height: 1.65;
 }
 
-/* Search input */
 label[for="q"].eyebrow {
   color: var(--color-ink) !important;
   font-size: 12px;
@@ -423,7 +422,8 @@ label[for="q"].eyebrow {
   display: none;
 }
 
-.hits button, .topics button {
+.hits button,
+.topics button {
   display: flex;
   gap: 12px;
   align-items: baseline;
@@ -440,7 +440,8 @@ label[for="q"].eyebrow {
   transition: background var(--dur);
 }
 
-.hits button:hover, .topics button:hover {
+.hits button:hover,
+.topics button:hover {
   background: var(--color-lavender-soft);
 }
 
@@ -455,7 +456,6 @@ label[for="q"].eyebrow {
   padding: 2px 8px;
 }
 
-/* Lecture List Cards */
 .list {
   display: grid;
   gap: 24px;
@@ -615,7 +615,6 @@ details summary:hover {
   padding-bottom: 4px;
 }
 
-/* Footer (Light/Dark Divider) */
 .foot {
   width: calc(100% - 48px);
   max-width: 1280px;
@@ -636,7 +635,8 @@ details summary:hover {
   min-width: 0;
 }
 
-.foot a, .jump-link {
+.foot a,
+.jump-link {
   color: var(--color-ink);
   font-weight: 700;
   text-decoration: underline;
@@ -646,12 +646,12 @@ details summary:hover {
   transition: background var(--dur);
 }
 
-.foot a:hover, .jump-link:hover {
+.foot a:hover,
+.jump-link:hover {
   background: var(--color-coral);
   text-decoration-color: var(--color-ink);
 }
 
-/* Topbar in Viewer */
 .topbar {
   position: sticky;
   top: env(safe-area-inset-top, 0px);
@@ -716,7 +716,6 @@ details summary:hover {
   display: none !important;
 }
 
-/* Dialogs */
 dialog {
   width: min(480px, calc(100vw - 32px));
   border: var(--border-ink);
@@ -759,7 +758,6 @@ dialog p b {
   flex-wrap: wrap;
 }
 
-/* 404 Not Found Page */
 .not-found {
   min-height: 100dvh;
   display: grid;
@@ -791,50 +789,98 @@ dialog p b {
   font-size: 15px;
 }
 
-/* Responsive adjustments */
 @media (max-width: 900px) {
-  .shell {
+.shell {
     grid-template-columns: minmax(0, 1fr);
     gap: 24px;
     padding: 20px 16px;
   }
-  .panel {
+
+.panel {
     position: static;
   }
-  .foot {
+
+.foot {
     width: calc(100% - 32px);
   }
+
 }
 
 @media (max-width: 580px) {
-  .meters {
+.meters {
     grid-template-columns: minmax(0, 1fr);
   }
-  .topics {
+
+.topics {
     grid-template-columns: minmax(0, 1fr);
   }
-  .lec {
+
+.lec {
     padding: 20px 18px;
   }
-  .lec header {
+
+.lec header {
     grid-template-columns: minmax(0, 1fr) auto;
   }
-  .no {
+
+.no {
     display: none;
   }
-  #vt {
+
+#vt {
     display: none;
   }
+
 }
 
 @media (max-width: 380px) {
-  .progress-actions {
+.progress-actions {
     grid-template-columns: minmax(0, 1fr);
   }
+
 }
 
 @media (prefers-reduced-motion: reduce) {
-  * {
+* {
     transition-duration: 0.01ms !important;
   }
+
+}
+
+.back-to-top {
+  position: fixed;
+  right: max(20px, env(safe-area-inset-right));
+  bottom: max(20px, env(safe-area-inset-bottom));
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  color: #151617;
+  background: #B09CFB;
+  border: 2px solid #151617;
+  border-radius: 12px;
+  box-shadow: 3px 3px 0 #151617;
+  cursor: pointer;
+}
+
+.back-to-top[hidden] {
+  display: none;
+}
+
+.back-to-top:hover {
+  background: #EAE5FF;
+}
+
+.back-to-top:focus-visible {
+  outline: 3px solid #151617;
+  outline-offset: 4px;
+}
+
+@media print {
+.back-to-top {
+    display: none;
+  }
+
 }

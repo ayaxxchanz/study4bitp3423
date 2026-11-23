@@ -22,13 +22,13 @@ A browser-based study hub helping UTeM students prepare for Special Topic in Sof
 
 | # | Lecture | Topics | MCQs | Flashcards | Structured questions |
 |---:|---|---:|---:|---:|---:|
-| 1 | Current Trends & Emerging Technologies | 12 | 15 | 43 | 17 |
+| 1 | Current Trends & Emerging Technologies | 5 | 15 | 43 | 17 |
 | 2 | Ethics & Social Responsibility | 8 | 15 | 35 | 17 |
-| 3 | Foundation of Enterprise Architecture | 10 | 15 | 36 | 17 |
-| 4 | Advanced Topics in Enterprise Architecture | 10 | 15 | 39 | 17 |
-| 5 | Advanced Technologies, Part 1 | 10 | 15 | 40 | 17 |
-| 6 | Advanced Technologies, Part 2 | 12 | 15 | 43 | 17 |
-| | **Total** | **62** | **90** | **236** | **102** |
+| 3 | Foundation of Enterprise Architecture | 8 | 15 | 36 | 17 |
+| 4 | Advanced Topics in Enterprise Architecture | 8 | 15 | 39 | 17 |
+| 5 | Advanced Technologies, Part 1 | 6 | 15 | 40 | 17 |
+| 6 | Advanced Technologies, Part 2 | 8 | 15 | 43 | 17 |
+| | **Total** | **43** | **90** | **236** | **102** |
 
 Each lecture provides 15 Part A structured questions across three practice sets and two extended Part B case studies. Every subquestion includes an indicative mark allocation, key marking points, and a full suggested answer.
 
@@ -105,18 +105,23 @@ This action cannot be undone. It does not clear unrelated browser data.
 ├── _headers                # Cloudflare Pages security headers
 ├── css/
 │   ├── dashboard.css       # Dashboard styles
-│   └── lecture.css         # Shared lecture styles
+│   └── lecture-1.css … lecture-6.css  # Complete styles for each lecture
 ├── fonts/
 │   ├── Rubik-Variable.ttf  # Locally bundled font
 │   └── OFL.txt             # Font license
 ├── js/
 │   ├── dashboard.js        # Dashboard behavior
-│   ├── lecture.js          # Shared lecture behavior
-│   └── data/               # Content for each lecture
-└── lectures/               # Individual lecture pages
+│   └── lecture-1.js … lecture-6.js    # Content and all behavior for each lecture
+├── lectures/               # Individual lecture pages
+└── tests/
+    └── lectures.test.cjs   # Asset and interaction regression checks
 ```
 
-The dashboard loads each lecture page in an iframe. Shared styling and behavior are kept in common CSS and JavaScript files, while each lecture's content is stored in its own data file. URL hashes and cross-frame messages handle lecture, section, and topic navigation.
+The dashboard loads each lecture page in an iframe. Each lecture uses one self-contained CSS file and one JavaScript file containing its study content, practice tools, summary interactions, progress storage, and back-to-top control. The dashboard also uses its own single CSS/JavaScript pair; its stylesheet serves the 404 page too. URL hashes and cross-frame messages handle lecture, section, and topic navigation.
+
+### Development checks
+
+With Node.js installed, run `node --test tests/lectures.test.cjs` from the project root. These checks cover asset references, saved drafts and progress, topic routing, practice tools, summary interactions, and the ROI calculator. They use a lightweight DOM fixture without external dependencies; they do not replace visual browser checks.
 
 ## Local data and privacy
 
