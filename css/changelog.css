@@ -1,0 +1,54 @@
+.changelog {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 36px 24px 48px;
+}
+
+.changelog-header {
+  margin-bottom: 28px;
+}
+
+.changelog-header h1 {
+  margin: 24px 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 6vw, 3rem);
+  line-height: 1.15;
+}
+
+.commit-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 16px;
+}
+
+.commit-list li {
+  min-width: 0;
+  padding: 20px 24px;
+  background: var(--color-card);
+  border: var(--border-ink);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  overflow-wrap: anywhere;
+}
+
+.commit-list li:first-child {
+  background: var(--color-lavender-soft);
+}
+
+.commit-list time {
+  color: var(--color-ink-muted);
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.commit-list p {
+  margin: 6px 0 0;
+  font-weight: 700;
+}
+
+@media (max-width: 480px) {
+  .changelog { padding: 24px 16px 36px; }
+  .commit-list li { padding: 16px; }
+}
