@@ -632,7 +632,7 @@ details summary:hover {
 }
 
 .topics li {
-  border-bottom: 1.5px dashed #151617;
+  border-bottom: 1.5px dashed var(--color-dashed-border, #151617);
   padding-bottom: 4px;
 }
 

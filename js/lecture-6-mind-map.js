@@ -618,7 +618,8 @@
         el.style.width = `${p.w}px`;
         el.style.height = `${p.h}px`;
         if (p.depth > 0) {
-          el.style.background = n.color;
+          // Branches keep bright colors; leaf cards follow the neutral theme surface.
+          el.style.background = p.depth === 1 ? n.color : `var(--study-surface-neutral, ${n.color})`;
         }
 
         const hasKids = n.children && n.children.length > 0;
@@ -896,7 +897,7 @@
                 ${(b.children || [])
                   .map(
                     (c) => `
-                    <div style="background:#ffffff; border:1.5px solid #000; border-radius:6px; padding:0.55rem 0.75rem; font-size:0.84rem;">
+                    <div class="outline-leaf" style="background:var(--study-surface-neutral, #ffffff); border:1.5px solid var(--nb-border); border-radius:6px; padding:0.55rem 0.75rem; font-size:0.84rem;">
                       <div style="display:flex; justify-content:space-between; margin-bottom:0.2rem;">
                         <strong>${c.title}</strong>
                         <span style="font-family:var(--font-body); font-size:0.7rem;">${c.slides}</span>

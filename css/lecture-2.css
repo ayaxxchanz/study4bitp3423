@@ -497,7 +497,7 @@ main {
 
 .step {
   background: var(--color-card);
-  border: 2px dashed #151617;
+  border: 2px dashed var(--color-dashed-border, #151617);
   border-radius: var(--radius-card);
   padding: 20px;
   box-shadow: none;
@@ -771,7 +771,7 @@ main {
   padding: 7px 14px;
   border-radius: var(--radius-pill);
   background: var(--color-card);
-  border: 2px dashed #151617;
+  border: 2px dashed var(--color-dashed-border, #151617);
   color: var(--color-ink);
   font-size: 12px;
   font-weight: 700;
@@ -792,7 +792,7 @@ main {
   position: absolute;
   z-index: -1;
   inset: 12% 8%;
-  border: 2px dashed #151617;
+  border: 2px dashed var(--color-dashed-border, #151617);
   border-radius: 32px;
   opacity: 0.35;
 }
@@ -894,7 +894,7 @@ main {
   padding: 8px 10px;
   border-radius: 8px;
   background: rgba(21, 22, 23, 0.08);
-  border: 1.5px dashed var(--color-ink);
+  border: 1.5px dashed var(--color-dashed-border, var(--color-ink));
   color: var(--color-ink);
   font-size: 11.5px;
   font-weight: 750;
@@ -948,7 +948,7 @@ main {
   align-items: stretch;
   margin-top: 24px;
   padding: 20px 22px;
-  border: 2px dashed #151617;
+  border: 2px dashed var(--color-dashed-border, #151617);
   border-radius: var(--radius-card);
   background: var(--color-mint-soft);
   box-shadow: none;
@@ -1004,7 +1004,7 @@ main {
   font-size: 14px;
   text-align: center;
   background: rgba(255, 255, 255, 0.92);
-  border: 2px dashed #151617;
+  border: 2px dashed var(--color-dashed-border, #151617);
   border-radius: 12px;
 }
 
@@ -1641,7 +1641,7 @@ button[data-guide]:hover {
   padding: 38px;
   text-align: center;
   color: var(--color-ink-muted);
-  border: 2px dashed #151617;
+  border: 2px dashed var(--color-dashed-border, #151617);
   border-radius: var(--radius-card);
   background: var(--color-card);
   font-weight: 600;

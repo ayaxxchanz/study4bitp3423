@@ -58,6 +58,7 @@ Each lecture contains five sections:
 - Printable study materials
 - Fixed last-updated timestamp in Malaysia time
 - Responsive layout for desktop and mobile screens
+- Dark mode with a saved preference, system theme detection, and synchronized lecture and mind-map views
 
 ## Running the project
 
