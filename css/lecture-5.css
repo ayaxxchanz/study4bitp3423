@@ -2687,3 +2687,17 @@ body.print-mind #mind-section.mind-drill .mind-node:after {
 @media print {
   .summary-card .topic-read-control { display: none; }
 }
+
+/* Keep the interactive map isolated from the lecture shell. */
+.lecture-five-mind-frame {
+  display: block;
+  width: 100%;
+  height: 900px;
+  border: var(--border-ink);
+  border-radius: var(--radius-card);
+  background: var(--color-card);
+  box-shadow: var(--shadow-card);
+}
+@media (max-width: 600px) {
+  .lecture-five-mind-frame { height: 1040px; }
+}

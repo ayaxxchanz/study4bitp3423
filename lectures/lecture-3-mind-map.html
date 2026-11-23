@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light">
+  <title>Lecture 3 Interactive Mind Map</title>
+  <link rel="stylesheet" href="../css/lecture-3-mind-map.css">
+  <script src="../js/lecture-3-mind-map.js" defer></script>
+</head>
+<body>
+<div class="app-shell">
+    <!-- TOP TOOLBAR -->
+    <header class="topbar">
+      <div class="brand-group">
+        <span class="nb-pill">BITP 3423 • Lecture 3 Mind Map</span>
+        <h1 class="topbar-title">Foundation of Enterprise Architecture: Layers, Frameworks &amp; Alignment</h1>
+      </div>
+
+      <div class="controls-group">
+        <div class="search-wrap">
+          <input
+            type="text"
+            id="search-input"
+            class="nb-input"
+            placeholder="Search nodes (e.g. Zachman, Data)..."
+            aria-label="Search mind map nodes"
+          />
+        </div>
+        <button class="nb-btn" data-action="expand">+ Expand All</button>
+        <button class="nb-btn" data-action="collapse">− Main Branches</button>
+        <button class="nb-btn" data-action="fit">Fit Map</button>
+        <button class="nb-btn" data-action="outline-open">Tree Outline</button>
+      </div>
+    </header>
+
+    <!-- WORKSPACE -->
+    <div class="workspace">
+      <!-- INTERACTIVE CANVAS -->
+      <main class="map-viewport" id="map-viewport">
+        <div class="map-stage" id="map-stage">
+          <svg class="map-lines" id="map-lines"></svg>
+          <div id="map-nodes"></div>
+        </div>
+
+        <!-- Branch Jump Chips -->
+        <div class="hud-bottom-left" aria-label="Branch quick jump">
+          <span class="legend-chip" style="background:#fda4af;" data-branch="b1" role="button" tabindex="0">01 Why EA Matters</span>
+          <span class="legend-chip" style="background:#fde047;" data-branch="b2" role="button" tabindex="0">02 Frameworks</span>
+          <span class="legend-chip" style="background:#86efac;" data-branch="b3" role="button" tabindex="0">03 4 EA Layers</span>
+          <span class="legend-chip" style="background:#fdba74;" data-branch="b4" role="button" tabindex="0">04 Registration Case</span>
+          <span class="legend-chip" style="background:#b8b8ff;" data-branch="b5" role="button" tabindex="0">05 Alignment Loop</span>
+          <span class="legend-chip" style="background:#7dd3fc;" data-branch="b6" role="button" tabindex="0">06 Tech &amp; Exit Q</span>
+        </div>
+
+        <!-- Zoom Controls -->
+        <div class="hud-zoom">
+          <button class="nb-btn" data-action="zoom-out" title="Zoom Out">−</button>
+          <span class="zoom-readout" id="zoom-readout">100%</span>
+          <button class="nb-btn" data-action="zoom-in" title="Zoom In">+</button>
+        </div>
+      </main>
+
+      <!-- RIGHT NODE INSPECTOR -->
+      <aside class="inspector" aria-label="Selected node details">
+        <div class="inspector-header">
+          <span class="inspector-label">// Node Slide Inspector</span>
+          <span class="insp-slide-ref" id="insp-counter">1 / 23</span>
+        </div>
+
+        <div class="inspector-body" id="inspector-body">
+          <!-- Populated dynamically -->
+        </div>
+
+        <div class="inspector-footer">
+          <button class="nb-btn" data-action="previous">Previous node</button>
+          <button class="nb-btn" data-action="next">Next node</button>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- FULL TREE OUTLINE MODAL -->
+  <div class="outline-overlay" id="outline-overlay" >
+    <div class="outline-modal" role="dialog" aria-modal="true" aria-labelledby="outline-title" tabindex="-1">
+      <div class="outline-header">
+        <div>
+          <span class="nb-pill" style="margin-bottom:0.35rem; display:inline-block;">BITP 3423 • Complete Branch Hierarchy</span>
+          <h2 id="outline-title" style="font-size:1.25rem;">Lecture 3 Mind Map — Full Structured Tree (Slides 1–21)</h2>
+        </div>
+        <button class="nb-btn" data-action="outline-close">✕ Close</button>
+      </div>
+      <div id="outline-content"></div>
+    </div>
+  </div>
+</body>
+</html>

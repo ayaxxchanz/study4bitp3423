@@ -1636,25 +1636,6 @@ $('flash-all').onclick=()=>{flashIndices=DATA.flashcards.map((_,i)=>i);flashPos=
 document.addEventListener('keydown',ev=>{if(!$('flash-section').classList.contains('active')||ev.target.closest('textarea,input,select'))return;if(ev.key==='ArrowRight')flashMove(1);if(ev.key==='ArrowLeft')flashMove(-1)});
 flashRender();
 
-// Fast-recall map: toggle question-only review without changing saved answers.
-(function(){
- const sec=document.getElementById('mind-section'),drill=document.getElementById('mind-drill'),print=document.getElementById('mind-print');
- if(!sec||!drill||!print)return;
- drill.addEventListener('click',()=>{
-   const enabled=sec.classList.toggle('mind-drill');
-   sec.querySelectorAll('.mind-node').forEach(el=>el.classList.remove('revealed'));
-   drill.textContent=enabled?'Show all key items':'Test my memory';
-   drill.setAttribute('aria-pressed',String(enabled));
- });
- sec.querySelectorAll('.mind-node').forEach(node=>{
-   const reveal=()=>{if(sec.classList.contains('mind-drill'))node.classList.toggle('revealed')};
-   node.addEventListener('click',reveal);
-   node.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();reveal()}});
- });
- print.addEventListener('click',()=>{document.body.classList.add('print-mind');window.print()});
- window.addEventListener('afterprint',()=>document.body.classList.remove('print-mind'));
-})();
-
 window.addEventListener('message',event=>{
  const route=event.data;
  if(!route||route.type!=='study-route')return;
