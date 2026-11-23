@@ -6,7 +6,7 @@ A browser-based study hub helping UTeM students prepare for Special Topic in Sof
 
 - [Study content](#study-content)
 - [Features](#features)
-- [Running the project](#running-the-project)
+- [Getting started](#getting-started)
 - [Understanding score](#understanding-score)
 - [Resetting progress](#resetting-progress)
 - [Project structure](#project-structure)
@@ -35,7 +35,7 @@ Each lecture provides 15 Part A structured questions across three practice sets 
 Each lecture contains five sections:
 
 1. **Summary** — notes organised by topic, with slide references.
-2. **Mind Map** — quick-recall groups and a memory-testing mode.
+2. **Mind Map** — an interactive graph with expandable nodes, search, slide notes, and a tree outline.
 3. **Structured Practice** — Part A questions and Part B case studies with mark allocations, marking points, full suggested answers, and autosaved response fields.
 4. **MCQ Practice** — immediate feedback and an explanation for each answer.
 5. **Flashcards** — cards that can be marked as known or needing more practice.
@@ -53,22 +53,24 @@ Each lecture contains five sections:
 - Multiple-choice practice with immediate feedback
 - Flashcards with known and needs-practice states
 - Local progress tracking
-- Versioned JSON export and import for transferring or backing up progress
+- Export and import for backing up or transferring progress
 - Confirmation dialog before all progress is reset
 - Printable study materials
-- Fixed last-updated timestamp in Malaysia time
+- Last-updated date shown in Malaysia time
 - Responsive layout for desktop and mobile screens
-- Dark mode with a saved preference, system theme detection, and synchronized lecture and mind-map views
+- Light and dark themes with your preference remembered across pages
 
-## Running the project
+## Getting started
 
-No installation or build process is required.
+Open the study hub in a modern browser and select a lecture. Use its tabs to read summaries, explore the mind map, practise questions, or review flashcards.
 
-1. Download or clone the project.
-2. Keep the project folders together in their existing structure.
-3. Open `index.html` in a modern browser.
+To use a downloaded copy:
 
-The project can also be served by any basic static web server. Use the same browser and project location when returning to saved progress.
+1. Download and extract the project.
+2. Keep all downloaded files and folders together.
+3. Open `index.html` in your browser.
+
+Use the same browser and project location when returning to saved progress.
 
 ## Understanding score
 
@@ -104,35 +106,23 @@ This action cannot be undone. It does not clear unrelated browser data.
 
 ```text
 .
-├── index.html              # Study dashboard
-├── 404.html                # Cloudflare Pages not-found page
-├── .gitignore              # Local and generated files excluded from Git
-├── _headers                # Cloudflare Pages security headers
-├── css/
-│   ├── dashboard.css       # Dashboard styles
-│   └── lecture-1.css … lecture-6.css  # Complete styles for each lecture
-├── fonts/
-│   ├── Rubik-Variable.ttf  # Locally bundled font
-│   └── OFL.txt             # Font license
-├── js/
-│   ├── dashboard.js        # Dashboard behavior
-│   └── lecture-1.js … lecture-6.js    # Content and all behavior for each lecture
-└── lectures/               # Individual lecture pages
+|-- index.html       # Main study dashboard
+|-- changelog.html   # Site update history
+|-- 404.html         # Page-not-found screen
+|-- lectures/        # Lecture pages and interactive mind maps
+|-- css/             # Page styles, themes, and shared button layouts
+|-- js/              # Study content and interactive features
+|-- assets/          # Site images
+|-- fonts/           # Bundled font and its license
+|-- scripts/         # Project maintenance tools
+`-- README.md        # Project overview and usage guide
 ```
-
-The dashboard loads each lecture page in an iframe. Each lecture uses one self-contained CSS file and one JavaScript file containing its study content, practice tools, summary interactions, progress storage, and back-to-top control. The dashboard also uses its own single CSS/JavaScript pair; its stylesheet serves the 404 page too. URL hashes and cross-frame messages handle lecture, section, and topic navigation.
 
 ## Local data and privacy
 
-Study progress and structured-answer drafts are stored in the browser using `localStorage`. They are not submitted to a server by the application.
+Your progress and typed answers are saved in your browser. They are not uploaded to a server.
 
-Each lecture stores five categories of data:
-
-- `mcq` — selected MCQ answers
-- `structured_answers_v2` — typed answers to structured subquestions
-- `structured_reviewed_v2` — structured-question review states
-- `flash` — flashcards marked known or needing practice
-- `topics_read_v1` — topics marked read in the Detailed Summary
+Saved progress includes topics marked read, MCQ answers, structured-answer drafts, reviewed questions, and flashcard ratings.
 
 Clearing browser storage or using the dashboard's reset option removes saved progress. Progress may also be stored separately when the project is opened from different locations or browsers.
 
@@ -140,32 +130,31 @@ The study hub does not require an internet connection for its learning features 
 
 ### Exporting and importing progress
 
-Use **Export progress** on the dashboard to download a versioned JSON backup. The file contains progress for all six lectures, including reading checkboxes and saved structured-answer drafts, and is created entirely in the browser without uploading data anywhere. New exports use version 2; version 1 backups are still accepted, with reading progress starting empty because those backups did not record it.
+Use **Export progress** on the dashboard to download a backup of your progress across all six lectures, including reading checkboxes and typed answers.
 
-Use **Import progress** to select a backup created by this study hub. The application validates its format and values before showing a confirmation. Confirming the import replaces the study hub progress currently stored in that browser. If browser storage fails during the import, the previous progress is restored.
+Use **Import progress** to restore a saved backup. You can review and confirm the import before it replaces your current progress. Older backups may not include reading progress.
 
-Backup files are not encrypted. Store them somewhere private if structured-answer drafts contain personal information.
+Keep backup files somewhere private if your typed answers contain personal information.
 
 ## Troubleshooting
 
 | Problem | What to try |
 |---|---|
-| The page shows a directory or raw code | Open `index.html`, not a CSS, JavaScript, or data file. |
-| A lecture does not load | Confirm that the `lectures`, `js`, `css`, and `fonts` folders remain beside `index.html`. |
-| Progress is not saved | Open the project directly in a browser, leave private browsing, and allow browser storage. |
-| Saved progress disappeared | Use the same browser and project location, and avoid clearing browser storage. |
-| The font does not load | Confirm that `fonts/Rubik-Variable.ttf` has not been moved or removed. |
+| The downloaded site does not open correctly | Extract the full download and open `index.html`. |
+| A lecture or part of the page does not load | Refresh the page. For a downloaded copy, keep all files and folders together. |
+| Progress is not saved | Use a regular browser window and allow the site to save data. |
+| Saved progress disappeared | Return using the same browser and site address, or import a saved backup. |
 
 ## Known limitations
 
 - Progress is local to one browser and page location; there is no account or cloud sync.
 - Clearing browser storage removes saved progress and structured-answer drafts.
-- Preview environments that block scripts, iframes, or local storage may not run the project correctly.
+- Some embedded previews may not support every feature. Open the site directly in your browser if needed.
 - The optional feedback form requires an internet connection when opened.
 
 ## Browser support
 
-Use a current version of Chrome, Edge, Firefox, or Safari. Browser settings that block local storage may prevent progress from being saved.
+Use a current version of Chrome, Edge, Firefox, or Safari. Browser settings that prevent the site from saving data may stop progress from being remembered.
 
 ## Content notice
 

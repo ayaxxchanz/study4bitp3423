@@ -1,46 +1,5 @@
 /* Neutral palette from the reference; the site's accent colors stay colorful. */
 :root { color-scheme: light; }
-.floating-controls {
-  position: fixed;
-  right: max(20px, env(safe-area-inset-right));
-  bottom: max(20px, env(safe-area-inset-bottom));
-  z-index: 60;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 12px;
-  pointer-events: none;
-}
-.floating-controls > :is(.theme-toggle, .back-to-top) {
-  position: static;
-  pointer-events: auto;
-}
-.floating-controls > .back-to-top[hidden] { display: none !important; }
-.floating-controls[hidden] { display: none !important; }
-.theme-toggle {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  flex-shrink: 0;
-  min-height: 48px;
-  padding: 8px 14px;
-  border: 2px solid #151617;
-  border-radius: 12px;
-  background: #B09CFB;
-  color: #151617;
-  box-shadow: 2px 2px 0 #000;
-  font: 700 14px/1.4 var(--font-body, system-ui, sans-serif);
-  cursor: pointer;
-}
-.theme-toggle:hover { background: #C4B5FD; }
-.theme-toggle:focus-visible { outline: 3px solid #FFBE98; outline-offset: 4px; }
-.theme-toggle svg { width: 20px; height: 20px; }
-.theme-sun { display: none; }
-@media (prefers-reduced-motion: reduce) {
-  .theme-toggle { transition: none; }
-}
-
 @media screen {
   :root[data-theme="dark"] {
     color-scheme: dark;
@@ -82,7 +41,7 @@
 
   /* Dark ink on the original bright accent surfaces, including their children. */
   [data-theme="dark"] :is(.hero, .btn, .big span, .tag, .no, .number,
-    .mark, .tab.active, .mind-node, .mind-intro-graphic span, .st-mark,
+    .mark, .tab.active, .st-mark,
     .card-face.back, .back-to-top) {
     --color-ink: #151617;
     --color-ink-muted: #27272a;
@@ -210,4 +169,3 @@
     color: #fafafa;
   }
 }
-@media print { .floating-controls, .theme-toggle { display: none !important; } }
