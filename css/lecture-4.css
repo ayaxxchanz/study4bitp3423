@@ -2613,3 +2613,47 @@ body.print-mind #mind-section.mind-drill .mind-node:after {
 #summary-list.lecture-four-summary .summary-card:nth-child(6) .number {
   background: #fda4af;
 }
+
+
+/* Reading checklist in each collapsible topic header. */
+.summary-card summary .topic-heading { flex: 1; min-width: 0; }
+.summary-card.topic-read summary .topic-title {
+  color: var(--color-coral-hover);
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+}
+.summary-card .topic-read-control {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 44px;
+  min-height: 44px;
+  flex: none;
+  margin: 0;
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.topic-read-control input {
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  accent-color: #167b61;
+  cursor: pointer;
+}
+.topic-read-control input:focus-visible {
+  outline: 3px solid #6e49cb;
+  outline-offset: 4px;
+}
+.reading-hint { margin: 1rem 0 0.25rem; font-size: 0.9rem; line-height: 1.6; }
+.reading-progress { margin: 0.25rem 0 1rem; font-size: 0.9rem; font-weight: 700; }
+@media (max-width: 580px) {
+  .topic-read-control .topic-read-label { display: none; }
+  .summary-card summary { gap: 8px; }
+}
+@media print {
+  .summary-card .topic-read-control { display: none; }
+}

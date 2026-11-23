@@ -46,6 +46,7 @@ Each lecture contains five sections:
 - Search across lecture topics
 - Direct links to lecture sections and individual topics
 - Overall and per-lecture understanding scores
+- Topic reading checkboxes with crossed-out titles and lecture-completion bars
 - Lecture switcher and dashboard return button
 - Lecture summaries and quick-recall mind maps
 - Structured questions and case studies with full suggested answers and marking points
@@ -73,12 +74,15 @@ The project can also be served by any basic static web server. Use the same brow
 Each lecture's understanding percentage is calculated from its complete set of activities:
 
 ```text
-Understanding % = 50 × (correct MCQs ÷ total MCQs)
-                + 30 × (known flashcards ÷ total flashcards)
+Understanding % = 20 × (topics marked read ÷ total topics)
+                + 40 × (correct MCQs ÷ total MCQs)
+                + 20 × (known flashcards ÷ total flashcards)
                 + 20 × (reviewed structured questions ÷ total structured questions)
 ```
 
 Unattempted activities contribute zero. The overall percentage is the average of all six lecture scores.
+
+Lecture completion measures reading separately: check **Read** in each Detailed Summary topic header to cross out its title and save that topic as read. Unchecking reverses it. Each lecture's completion bar is the proportion of its topics marked read; a lecture is fully read when every topic is checked. The overall reading bar counts read topics across all six lectures. Reading progress contributes up to 20 percentage points to understanding, while practice contributes the other 80.
 
 | Score | Level |
 |---:|---|
@@ -112,27 +116,22 @@ This action cannot be undone. It does not clear unrelated browser data.
 ├── js/
 │   ├── dashboard.js        # Dashboard behavior
 │   └── lecture-1.js … lecture-6.js    # Content and all behavior for each lecture
-├── lectures/               # Individual lecture pages
-└── tests/
-    └── lectures.test.cjs   # Asset and interaction regression checks
+└── lectures/               # Individual lecture pages
 ```
 
 The dashboard loads each lecture page in an iframe. Each lecture uses one self-contained CSS file and one JavaScript file containing its study content, practice tools, summary interactions, progress storage, and back-to-top control. The dashboard also uses its own single CSS/JavaScript pair; its stylesheet serves the 404 page too. URL hashes and cross-frame messages handle lecture, section, and topic navigation.
-
-### Development checks
-
-With Node.js installed, run `node --test tests/lectures.test.cjs` from the project root. These checks cover asset references, saved drafts and progress, topic routing, practice tools, summary interactions, and the ROI calculator. They use a lightweight DOM fixture without external dependencies; they do not replace visual browser checks.
 
 ## Local data and privacy
 
 Study progress and structured-answer drafts are stored in the browser using `localStorage`. They are not submitted to a server by the application.
 
-Each lecture stores four categories of data:
+Each lecture stores five categories of data:
 
 - `mcq` — selected MCQ answers
 - `structured_answers_v2` — typed answers to structured subquestions
 - `structured_reviewed_v2` — structured-question review states
 - `flash` — flashcards marked known or needing practice
+- `topics_read_v1` — topics marked read in the Detailed Summary
 
 Clearing browser storage or using the dashboard's reset option removes saved progress. Progress may also be stored separately when the project is opened from different locations or browsers.
 
@@ -140,7 +139,7 @@ The study hub does not require an internet connection for its learning features 
 
 ### Exporting and importing progress
 
-Use **Export progress** on the dashboard to download a versioned JSON backup. The file contains progress for all six lectures, including saved structured-answer drafts, and is created entirely in the browser without uploading data anywhere.
+Use **Export progress** on the dashboard to download a versioned JSON backup. The file contains progress for all six lectures, including reading checkboxes and saved structured-answer drafts, and is created entirely in the browser without uploading data anywhere. New exports use version 2; version 1 backups are still accepted, with reading progress starting empty because those backups did not record it.
 
 Use **Import progress** to select a backup created by this study hub. The application validates its format and values before showing a confirmation. Confirming the import replaces the study hub progress currently stored in that browser. If browser storage fails during the import, the previous progress is restored.
 

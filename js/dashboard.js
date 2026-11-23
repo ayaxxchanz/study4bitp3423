@@ -12,8 +12,8 @@ mcq:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="m7 9 2 2 4-4M7 16
 flash:'<rect x="7" y="3" width="14" height="16" rx="2"/><path d="M17 21H5a2 2 0 0 1-2-2V7m11 0-3 5h5l-3 5"/>'
 };
 const jumpIcon=key=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${GO_ICONS[key]}</svg>`;
-const BACKUP_APP='study4bitp3423-progress',BACKUP_VERSION=1,PROGRESS_KEYS=['mcq','flash','reviewed','essays'],MAX_BACKUP_BYTES=2*1024*1024;
-const STORAGE_SUFFIX={reviewed:'structured_reviewed_v2',essays:'structured_answers_v2'};
+const BACKUP_APP='study4bitp3423-progress',BACKUP_VERSION=2,PROGRESS_KEYS=['mcq','flash','reviewed','essays','topicsRead'],MAX_BACKUP_BYTES=2*1024*1024;
+const STORAGE_SUFFIX={reviewed:'structured_reviewed_v2',essays:'structured_answers_v2',topicsRead:'topics_read_v1'};
 let storeOK=true;try{localStorage.setItem('__t','1');localStorage.removeItem('__t')}catch(e){storeOK=false}
 const read=(L,k)=>{try{return JSON.parse(localStorage.getItem(L.prefix+(STORAGE_SUFFIX[k]||k)))||{}}catch(e){return{}}};
 const isRecord=value=>value!==null&&typeof value==='object'&&!Array.isArray(value);
@@ -44,21 +44,24 @@ return{
 mcq:cleanIndexed(source.mcq,L.correct.length,value=>Number.isInteger(value)&&value>=0&&value<=3,'MCQ',strict),
 flash:cleanIndexed(source.flash,L.flash,value=>value==='known'||value==='missed','flashcard',strict),
 reviewed:cleanIndexed(source.reviewed,L.structured,value=>typeof value==='boolean','reviewed structured question',strict),
-essays:cleanStructuredAnswers(source.essays,L,strict)
+essays:cleanStructuredAnswers(source.essays,L,strict),
+topicsRead:cleanIndexed(source.topicsRead,L.topics.length,value=>typeof value==='boolean','read topic',strict)
 };
 }
 function makeBackup(){
 return{app:BACKUP_APP,version:BACKUP_VERSION,exportedAt:new Date().toISOString(),lectures:META.map((L,index)=>({id:index+1,...cleanLecture(Object.fromEntries(PROGRESS_KEYS.map(key=>[key,read(L,key)])),L,false)}))};
 }
 function validateBackup(value){
-if(!isRecord(value)||value.app!==BACKUP_APP||value.version!==BACKUP_VERSION)throw new Error('This is not a compatible Study Hub backup.');
+if(!isRecord(value)||value.app!==BACKUP_APP||![1,BACKUP_VERSION].includes(value.version))throw new Error('This is not a compatible Study Hub backup.');
 if(typeof value.exportedAt!=='string'||!Number.isFinite(Date.parse(value.exportedAt)))throw new Error('The backup date is invalid.');
 if(!Array.isArray(value.lectures)||value.lectures.length!==META.length)throw new Error('The backup must contain all six lectures.');
 const seen=new Set(),lectures=[];
 for(const entry of value.lectures){
 if(!isRecord(entry)||!Number.isInteger(entry.id)||entry.id<1||entry.id>META.length||seen.has(entry.id))throw new Error('The backup contains an invalid lecture id.');
 if(Object.keys(entry).some(key=>key!=='id'&&!PROGRESS_KEYS.includes(key)))throw new Error('The backup contains an unexpected field.');
-seen.add(entry.id);lectures[entry.id-1]=cleanLecture(Object.fromEntries(PROGRESS_KEYS.map(key=>[key,entry[key]])),META[entry.id-1],true);
+const progress=Object.fromEntries(PROGRESS_KEYS.map(key=>[key,entry[key]]));
+if(value.version===1&&progress.topicsRead===undefined)progress.topicsRead={};
+seen.add(entry.id);lectures[entry.id-1]=cleanLecture(progress,META[entry.id-1],true);
 }
 return{app:BACKUP_APP,version:BACKUP_VERSION,exportedAt:value.exportedAt,lectures};
 }
@@ -75,25 +78,36 @@ throw error;
 }
 }
 function stats(L){
-const m=read(L,'mcq'),f=read(L,'flash'),e=read(L,'reviewed');
+const m=cleanIndexed(read(L,'mcq'),L.correct.length,value=>Number.isInteger(value)&&value>=0&&value<=3,'MCQ',false);
+const f=cleanIndexed(read(L,'flash'),L.flash,value=>value==='known'||value==='missed','flashcard',false);
+const e=cleanIndexed(read(L,'reviewed'),L.structured,value=>typeof value==='boolean','reviewed question',false);
+const r=cleanIndexed(read(L,'topicsRead'),L.topics.length,value=>typeof value==='boolean','read topic',false);
 let answered=0,correct=0;L.correct.forEach((c,i)=>{if(Number.isInteger(m[i])){answered++;if(m[i]===c)correct++}});
 const known=Object.keys(f).filter(i=>f[i]==='known'&&+i<L.flash).length;
 const reviewed=Object.keys(e).filter(i=>e[i]&&+i<L.structured).length;
-const u=Math.round(50*correct/L.correct.length+30*known/L.flash+20*reviewed/L.structured);
-return{answered,correct,known,reviewed,u,active:answered+known+reviewed>0};
+const topicsRead=Object.values(r).filter(value=>value===true).length;
+const u=Math.round(20*topicsRead/L.topics.length+40*correct/L.correct.length+20*known/L.flash+20*reviewed/L.structured);
+return{answered,correct,known,reviewed,topicsRead,complete:topicsRead===L.topics.length,u,active:answered+known+reviewed+topicsRead>0};
 }
 function level(u,active){return !active?'Not started':u<25?'Getting started':u<50?'Building':u<75?'Developing':u<90?'Strong':'Exam-ready'}
-const meter=(label,val,tot)=>`<div><div class="mh"><span>${label}</span><b>${val} / ${tot}</b></div><span class="bar"><i style="transform:scaleX(${tot?val/tot:0})"></i></span></div>`;
+const meter=(label,val,tot)=>`<div><div class="mh"><span>${label}</span><b>${val} / ${tot}</b></div><span class="bar" role="progressbar" aria-label="${label}" aria-valuemin="0" aria-valuemax="${tot}" aria-valuenow="${val}"><i style="transform:scaleX(${tot?val/tot:0})"></i></span></div>`;
 function render(){
 const S=META.map(stats);
 $('list').innerHTML=META.map((L,i)=>{const s=S[i];return`<article class="lec" id="row-${i+1}"><header><span class="no">${String(i+1).padStart(2,'0')}</span><h2>${esc(L.title)}</h2><div class="score"><b>${s.u}%</b><span>${level(s.u,s.active)}</span></div></header>
-<div class="meters">${meter('MCQ mark',s.correct,L.correct.length)}${meter('Flashcards known',s.known,L.flash)}${meter('Structured questions reviewed',s.reviewed,L.structured)}</div>
+<div class="meters">${meter('Lecture completion',s.topicsRead,L.topics.length)}${meter('MCQ mark',s.correct,L.correct.length)}${meter('Flashcards known',s.known,L.flash)}${meter('Structured questions reviewed',s.reviewed,L.structured)}</div>
 <div class="acts"><button class="btn primary" data-open="${i+1}" type="button">Open lecture</button><span class="sep">Jump to</span>${GO.map(g=>`<a class="jump-link" href="#lecture-${i+1}" data-open="${i+1}" data-go="${g[0]}">${jumpIcon(g[0])}<span>${g[1]}</span></a>`).join('')}</div>
 <details><summary>${L.topics.length} topics</summary><ol class="topics">${L.topics.map((t,j)=>`<li><button data-open="${i+1}" data-topic="${j}" type="button">${esc(t)}</button></li>`).join('')}</ol></details></article>`}).join('');
 const sum=k=>S.reduce((a,s)=>a+s[k],0),tot=k=>META.reduce((a,L)=>a+(k==='c'?L.correct.length:k==='f'?L.flash:L.structured),0);
 const any=S.some(s=>s.active),o=Math.round(S.reduce((a,s)=>a+s.u,0)/S.length);
 $('oPct').textContent=o+'%';$('oLvl').textContent=level(o,any);$('oBar').style.transform=`scaleX(${o/100})`;
 $('oBarLabel').setAttribute('aria-label','Overall understanding '+o+' percent');
+const totalTopics=META.reduce((total,L)=>total+L.topics.length,0),readTopics=sum('topicsRead');
+$('completionPct').textContent=Math.round(100*readTopics/totalTopics)+'%';
+$('completionCount').textContent=readTopics+' / '+totalTopics+' topics read';
+$('completionBar').style.transform=`scaleX(${readTopics/totalTopics})`;
+$('completionBarLabel').setAttribute('aria-valuemax',String(totalTopics));
+$('completionBarLabel').setAttribute('aria-valuenow',String(readTopics));
+$('completionLectures').textContent=S.filter(s=>s.complete).length+' / '+META.length+' lectures fully read';
 $('oStats').innerHTML=[['MCQ marks',sum('correct')+' / '+tot('c')],['Flashcards known',sum('known')+' / '+tot('f')],['Structured questions reviewed',sum('reviewed')+' / '+tot('e')],['Lectures started',S.filter(s=>s.active).length+' / '+META.length]].map(r=>`<div><dt>${r[0]}</dt><dd>${r[1]}</dd></div>`).join('');
 $('storeWarn').hidden=storeOK;
 }
@@ -144,7 +158,7 @@ $('resetBtn').onclick=()=>$('dlg').showModal();
 $('cancelBtn').onclick=()=>$('dlg').close();
 function wipe(){
 closeFrame();$('viewer').hidden=true;
-META.forEach(L=>{['mcq','flash','reviewed','essays','structured_reviewed_v2','structured_answers_v2'].forEach(k=>{try{localStorage.removeItem(L.prefix+k)}catch(e){}})});
+META.forEach(L=>{['mcq','flash','reviewed','essays','structured_reviewed_v2','structured_answers_v2','topics_read_v1'].forEach(k=>{try{localStorage.removeItem(L.prefix+k)}catch(e){}})});
 history.pushState('',document.title,location.pathname+location.search);
 $('dash').hidden=false;render();$('status').textContent='Progress for Lectures 1–6 has been reset.'}
 $('confirmBtn').onclick=()=>{$('dlg').close();wipe()};

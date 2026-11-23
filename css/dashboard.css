@@ -19,6 +19,7 @@
   --color-lavender-soft: #EAE5FF;
   --color-coral: #FFBE98;
   --color-coral-hover: #FFAA75;
+  --color-mint: #4ECB71;
 
   --color-ink: #151617;
   --color-ink-muted: #52525B;
@@ -528,9 +529,29 @@ label[for="q"].eyebrow {
 
 .meters {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
 }
+
+.completion-summary {
+  margin: 18px 0;
+  padding-top: 16px;
+  border-top: 1px solid #52525b;
+}
+
+.completion-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.completion-summary .bar i,
+.meters > div:first-child .bar i { background: var(--color-mint); }
+
+.completion-summary .note { margin: 8px 0 0; }
 
 .meters .bar {
   background: #E4E4E7;

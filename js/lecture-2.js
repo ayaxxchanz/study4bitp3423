@@ -1446,8 +1446,50 @@ function openTopic(index){
 document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>tab(b.dataset.go)));
 window.addEventListener('hashchange',restoreTab);
 $('topicCount').textContent=DATA.summary.length;$('essayCount').textContent=STRUCTURED.length;$('mcqCount').textContent=DATA.mcq.length;$('flashCount').textContent=DATA.flashcards.length;
+
+// Topic reading progress is stored separately from practice performance.
+function loadReadTopics(){
+ const saved=storage.get('topics_read_v1',{});
+ if(!saved||typeof saved!=='object'||Array.isArray(saved))return{};
+ return Object.fromEntries(DATA.summary.flatMap((_,index)=>saved[index]===true?[[index,true]]:[]));
+}
+let topicsRead=loadReadTopics();
+function updateReadingProgress(){
+ const count=Object.keys(topicsRead).length;
+ $('reading-progress').textContent=`${count} / ${DATA.summary.length} topics read${count===DATA.summary.length?' ? lecture complete':''}`;
+}
+
 // Detailed notes. All topic details start expanded for reading.
-$('summary-list').innerHTML=DATA.summary.map((t,i)=>`<details class="summary-card" id="topic-${i+1}" open><summary id="topic-${i+1}-header" aria-controls="topic-${i+1}-content"><span class="number">${String(i+1).padStart(2,'0')}</span><span><h3>${esc(t.title)}</h3><span class="source">Source slides ${esc(t.slides)}</span></span><span class="down" aria-hidden="true"><svg class="lucide" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></summary><div class="inner" id="topic-${i+1}-content" aria-labelledby="topic-${i+1}-header">${t.html}</div></details>`).join('');
+$('summary-list').innerHTML=DATA.summary.map((t,i)=>`<details class="summary-card${topicsRead[i]===true?' topic-read':''}" id="topic-${i+1}" open><summary id="topic-${i+1}-header" aria-controls="topic-${i+1}-content"><span class="number">${String(i+1).padStart(2,'0')}</span><span class="topic-heading"><h3 class="topic-title">${esc(t.title)}</h3><span class="source">Source slides ${esc(t.slides)}</span></span><label class="topic-read-control" data-topic-read-control><input type="checkbox" id="topic-read-${i+1}" data-topic-read="${i}" aria-label="Mark topic ${i+1} as read: ${esc(t.title)}" ${topicsRead[i]===true?'checked':''}/><span class="topic-read-label">Read</span></label><span class="down" aria-hidden="true"><svg class="lucide" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></summary><div class="inner" id="topic-${i+1}-content" aria-labelledby="topic-${i+1}-header">${t.html}</div></details>`).join('');
+
+$('summary-list').addEventListener('click',event=>{
+ if(event.target.closest('[data-topic-read-control]'))event.stopPropagation();
+});
+$('summary-list').addEventListener('keydown',event=>{
+ if(event.target.closest('[data-topic-read-control]'))event.stopPropagation();
+});
+$('summary-list').addEventListener('change',event=>{
+ const checkbox=event.target.closest('[data-topic-read]');
+ if(!checkbox)return;
+ const index=Number(checkbox.dataset.topicRead);
+ if(!Number.isInteger(index)||index<0||index>=DATA.summary.length)return;
+ if(checkbox.checked)topicsRead[index]=true;else delete topicsRead[index];
+ storage.set('topics_read_v1',topicsRead);
+ $('topic-'+(index+1)).classList.toggle('topic-read',checkbox.checked);
+ updateReadingProgress();
+});
+window.addEventListener('storage',event=>{
+ if(event.key!==STORAGE_PREFIX+'topics_read_v1'&&event.key!==null)return;
+ topicsRead=loadReadTopics();
+ DATA.summary.forEach((_,index)=>{
+  const checkbox=$('topic-read-'+(index+1));
+  checkbox.checked=topicsRead[index]===true;
+  $('topic-'+(index+1)).classList.toggle('topic-read',checkbox.checked);
+ });
+ updateReadingProgress();
+});
+updateReadingProgress();
+
 $('expand-all').onclick=()=>document.querySelectorAll('.summary-card').forEach(e=>e.open=true);
 $('collapse-all').onclick=()=>document.querySelectorAll('.summary-card').forEach(e=>e.open=false);
 function doPrint(mode){document.body.classList.remove('print-summary','print-questions','print-answers');document.body.classList.add('print-'+mode);document.querySelectorAll('.summary-card').forEach(e=>e.open=true);if(mode==='answers')document.querySelectorAll('.answer-box').forEach(e=>e.classList.remove('hidden'));window.print();}
